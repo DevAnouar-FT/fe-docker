@@ -402,7 +402,13 @@ export const qs = {
 
 
                 if (value.length === 1) {
-                    value = JSON.parse(decodeURIComponent(value[0]));
+                    try {
+                        value = JSON.parse(decodeURIComponent(value[0]));
+                    } catch (error) {
+                        if (error.name !== 'SyntaxError') {
+                            throw error;
+                        }
+                    }
                 }
 
                 accumulator[key] = value;
@@ -417,7 +423,7 @@ export const qs = {
         Object.entries(obj).forEach(([key, value]) => {
             if (Array.isArray(value)) {
                 if (array === 'comma') {
-                    searchParams.set(key, JSON.stringify(value));
+                    searchParams.append(key, value.length > 1 ? JSON.stringify(value) : value);
                 } else {
                     value.forEach((valueItem) => {
                         searchParams.append(key, valueItem);
